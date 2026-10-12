@@ -37,35 +37,28 @@ small{color:var(--muted)}.section-title{display:flex;justify-content:space-betwe
 <main>
 <section id="calc" class="panel active">
  <div class="card">
-  <h1>Calculadora de preço</h1><p class="muted">Preencha os custos e compare Clássico e Premium. As taxas abaixo são editáveis e não representam tarifas oficiais universais.</p>
+  <h1>Calculadora de preço</h1><p class="muted">Informe o custo e quanto quer lucrar em porcentagem. O Precifica ML calcula o preço recomendado para cada modalidade.</p>
   <div class="field"><label for="productName">Nome do produto (opcional)</label><input id="productName" placeholder="Ex.: Cabo de dados USB"></div>
   <div class="grid">
-   <div class="field"><label for="cost">Custo do produto (R$)</label><input id="cost" type="number" min="0" step=".01" value="3"></div>
-   <div class="field"><label for="salePrice">Preço de venda (R$)</label><input id="salePrice" type="number" min="0" step=".01" value="19.90"></div>
-   <div class="field"><label for="shipping">Frete pago por você (R$)</label><input id="shipping" type="number" min="0" step=".01" value="0"></div>
-   <div class="field"><label for="fixed">Tarifa fixa por venda (R$)</label><input id="fixed" type="number" min="0" step=".01" value="0"></div>
-   <div class="field"><label for="packaging">Embalagem/outros custos (R$)</label><input id="packaging" type="number" min="0" step=".01" value="0"></div>
-   <div class="field"><label for="target">Lucro desejado por unidade (R$)</label><input id="target" type="number" min="0" step=".01" value="10"></div>
+   <div class="field"><label for="cost">Custo do produto (R$)</label><input id="cost" type="number" min="0" step=".01" value="30"></div>
+   <div class="field"><label for="target">Lucro desejado sobre o custo (%)</label><input id="target" type="number" min="0" max="999" step="1" value="30"></div>
   </div>
-  <h3>Taxas percentuais</h3>
-  <div class="grid">
-   <div class="field"><label for="classicRate">Comissão Clássico (%)</label><input id="classicRate" type="number" min="0" max="99.99" step=".1" value="14"></div>
-   <div class="field"><label for="premiumRate">Comissão Premium (%)</label><input id="premiumRate" type="number" min="0" max="99.99" step=".1" value="19"></div>
-   <div class="field"><label for="adsRate">Publicidade (%)</label><input id="adsRate" type="number" min="0" max="99.99" step=".1" value="0"></div>
-   <div class="field"><label for="taxRate">Impostos (%)</label><input id="taxRate" type="number" min="0" max="99.99" step=".1" value="0"></div>
-  </div>
-  <div class="actions"><button class="btn" id="calculate">Calcular</button><button class="btn light" id="saveHistory">Salvar no histórico</button><button class="btn light" id="saveProduct">Salvar no catálogo</button></div>
+  <details style="margin:4px 0 14px"><summary style="font-weight:800;cursor:pointer;padding:8px 0">Custos adicionais (opcional)</summary>
+   <div class="grid" style="margin-top:10px">
+    <div class="field"><label for="shipping">Frete pago por você (R$)</label><input id="shipping" type="number" min="0" step=".01" value="0"></div>
+    <div class="field"><label for="fixed">Tarifa fixa por venda (R$)</label><input id="fixed" type="number" min="0" step=".01" value="0"></div>
+    <div class="field"><label for="packaging">Embalagem/outros custos (R$)</label><input id="packaging" type="number" min="0" step=".01" value="0"></div>
+   </div>
+  </details>
+  <input id="salePrice" type="hidden" value="0">
+  <div class="actions"><button class="btn" id="calculate">Calcular preço ideal</button><button class="btn light" id="saveHistory">Salvar no histórico</button><button class="btn light" id="saveProduct">Salvar no catálogo</button></div>
  </div>
  <div class="card">
-  <div class="section-title"><h2>Resultado da simulação</h2><span class="muted" id="resultMode">Preço informado</span></div>
+  <div class="section-title"><h2>Preço de venda recomendado</h2><span class="muted" id="resultMode">Calculado pela meta</span></div>
   <div class="grid3">
-   <div class="metric"><div class="label">Lucro Clássico</div><div id="classicProfit" class="value">—</div><small id="classicMargin">Margem: —</small></div>
-   <div class="metric"><div class="label">Lucro Premium</div><div id="premiumProfit" class="value">—</div><small id="premiumMargin">Margem: —</small></div>
-   <div class="metric"><div class="label">Preço mínimo (Clássico)</div><div id="classicMin" class="value">—</div><small>Lucro zero estimado</small></div>
-  </div>
-  <div class="grid" style="margin-top:12px">
-   <div class="metric"><div class="label">Preço para meta (Clássico)</div><div id="classicTarget" class="value">—</div><small>Alcançar o lucro desejado</small></div>
-   <div class="metric"><div class="label">Preço para meta (Premium)</div><div id="premiumTarget" class="value">—</div><small>Alcançar o lucro desejado</small></div>
+   <div class="metric"><div class="label">Preço recomendado · Clássico</div><div id="classicTarget" class="value">—</div><small id="classicProfit">Lucro líquido: —</small><small id="classicMargin">Margem: —</small></div>
+   <div class="metric"><div class="label">Preço recomendado · Premium</div><div id="premiumTarget" class="value">—</div><small id="premiumProfit">Lucro líquido: —</small><small id="premiumMargin">Margem: —</small></div>
+   <div class="metric"><div class="label">Lucro desejado por unidade</div><div id="targetMoney" class="value">—</div><small>Percentual aplicado sobre o custo</small></div>
   </div>
   <div id="warning" class="notice" style="margin-top:12px">Revise as tarifas reais antes de publicar o anúncio.</div>
  </div>
@@ -80,7 +73,12 @@ small{color:var(--muted)}.section-title{display:flex;justify-content:space-betwe
  <div class="card"><div class="section-title"><h1>Histórico</h1><div class="actions"><button class="btn light" id="exportHistory">Exportar CSV</button><button class="btn danger" id="clearHistory">Apagar</button></div></div><p class="muted">Cada simulação salva o preço, taxas e lucro estimado daquele momento.</p><div id="historyList" class="empty">Nenhuma simulação salva ainda.</div></div>
 </section>
 <section id="settings" class="panel">
- <div class="card"><h1>Configurações e dados</h1><p>O Precifica ML salva dados localmente neste navegador. Para manter um backup, exporte o catálogo e o histórico em CSV.</p><div class="notice">Atenção: o app não está conectado à conta do Mercado Livre e não consulta tarifas automaticamente. Confira as condições exibidas na sua conta, pois comissões, tarifas fixas, frete e regras podem variar por categoria, preço, modalidade e reputação.</div><h2 style="margin-top:18px">Backup</h2><div class="actions"><button class="btn" id="backup">Baixar backup JSON</button><label class="btn light" style="cursor:pointer">Importar backup JSON<input id="restore" type="file" accept=".json,application/json" hidden></label><button class="btn danger" id="resetAll">Apagar todos os dados</button></div><p class="muted" style="margin-top:12px">O arquivo de backup inclui catálogo, histórico e configurações locais. Guarde-o em local seguro.</p></div>
+ <div class="card"><h1>Configurações e dados</h1><p>O Precifica ML salva dados localmente neste navegador. Para manter um backup, exporte o catálogo e o histórico em CSV.</p><div class="notice">Atenção: o app não está conectado à conta do Mercado Livre e não consulta tarifas automaticamente. Confira as condições exibidas na sua conta, pois comissões, tarifas fixas, frete e regras podem variar por categoria, preço, modalidade e reputação.</div><h2 style="margin-top:18px">Taxas usadas no cálculo</h2><p class="muted">Edite aqui suas taxas. Elas serão usadas automaticamente na calculadora.</p><div class="grid">
+<div class="field"><label for="classicRate">Comissão Clássico (%)</label><input id="classicRate" type="number" min="0" max="99.99" step=".1" value="14"></div>
+<div class="field"><label for="premiumRate">Comissão Premium (%)</label><input id="premiumRate" type="number" min="0" max="99.99" step=".1" value="19"></div>
+<div class="field"><label for="adsRate">Publicidade (%)</label><input id="adsRate" type="number" min="0" max="99.99" step=".1" value="0"></div>
+<div class="field"><label for="taxRate">Impostos (%)</label><input id="taxRate" type="number" min="0" max="99.99" step=".1" value="0"></div>
+</div><h2 style="margin-top:18px">Backup</h2><div class="actions"><button class="btn" id="backup">Baixar backup JSON</button><label class="btn light" style="cursor:pointer">Importar backup JSON<input id="restore" type="file" accept=".json,application/json" hidden></label><button class="btn danger" id="resetAll">Apagar todos os dados</button></div><p class="muted" style="margin-top:12px">O arquivo de backup inclui catálogo, histórico e configurações locais. Guarde-o em local seguro.</p></div>
 </section>
 <footer class="muted" style="text-align:center;padding:8px 8px 20px">Precifica ML · Ferramenta independente, sem vínculo oficial com o Mercado Livre.</footer>
 </main>
@@ -97,19 +95,20 @@ function money(n){return Number.isFinite(n)?n.toLocaleString('pt-BR',{style:'cur
 function pct(n){return Number.isFinite(n)?n.toLocaleString('pt-BR',{maximumFractionDigits:1})+'%':'—'}
 function inputs(){return Object.fromEntries(ids.map(id=>[id,$(id).value]))}
 function compute(d=inputs()){
- const n=k=>Math.max(0,Number.parseFloat(d[k])||0), fixed=n('cost')+n('shipping')+n('fixed')+n('packaging');
- const ad=n('adsRate')/100, tax=n('taxRate')/100;
- const calc=(rate,price=n('salePrice'))=>{const r=rate/100+ad+tax;return {rate:r,profit:price*(1-r)-fixed,margin:price>0?(price*(1-r)-fixed)/price*100:0,costs:fixed+price*r,min:r<1?fixed/(1-r):Infinity,target:r<1?(fixed+n('target'))/(1-r):Infinity}};
- return {d,fixed,classic:calc(n('classicRate')),premium:calc(n('premiumRate'))};
+ const n=k=>Math.max(0,Number.parseFloat(d[k])||0), productCost=n('cost'), fixed=productCost+n('shipping')+n('fixed')+n('packaging');
+ const desiredProfit=productCost*n('target')/100, ad=n('adsRate')/100, tax=n('taxRate')/100;
+ const calc=(rate)=>{const r=rate/100+ad+tax, min=r<1?fixed/(1-r):Infinity, targetPrice=r<1?(fixed+desiredProfit)/(1-r):Infinity, profit=Number.isFinite(targetPrice)?targetPrice*(1-r)-fixed:NaN;return {rate:r,profit,margin:targetPrice>0?profit/targetPrice*100:0,costs:fixed+(Number.isFinite(targetPrice)?targetPrice*r:0),min,target:targetPrice}};
+ return {d,fixed,desiredProfit,classic:calc(n('classicRate')),premium:calc(n('premiumRate'))};
 }
 function show(){
- const x=compute(), c=x.classic,p=x.premium, price=num('salePrice');
- $('classicProfit').textContent=money(c.profit);$('premiumProfit').textContent=money(p.profit);
+ const x=compute(), c=x.classic,p=x.premium;
+ $('salePrice').value=Number.isFinite(c.target)?c.target.toFixed(2):'0';
+ $('classicTarget').textContent=money(c.target);$('premiumTarget').textContent=money(p.target);$('targetMoney').textContent=money(x.desiredProfit);
+ $('classicProfit').textContent='Lucro líquido: '+money(c.profit);$('premiumProfit').textContent='Lucro líquido: '+money(p.profit);
  $('classicMargin').textContent='Margem: '+pct(c.margin);$('premiumMargin').textContent='Margem: '+pct(p.margin);
- $('classicProfit').className='value '+(c.profit>=0?'good':'bad');$('premiumProfit').className='value '+(p.profit>=0?'good':'bad');
- $('classicMin').textContent=money(c.min);$('classicTarget').textContent=money(c.target);$('premiumTarget').textContent=money(p.target);
- $('comparison').innerHTML=[['Clássico',c],['Premium',p]].map(([name,r])=>`<tr><td><strong>${name}</strong></td><td>${money(price)}</td><td>${money(r.costs)}</td><td class="${r.profit>=0?'good':'bad'}"><strong>${money(r.profit)}</strong></td><td>${pct(r.margin)}</td></tr>`).join('');
- $('warning').textContent=(num('classicRate')+num('adsRate')+num('taxRate')>=100||num('premiumRate')+num('adsRate')+num('taxRate')>=100)?'Atenção: os percentuais de uma modalidade chegaram a 100% ou mais; revise os valores.':'Estimativa: preço mínimo e preço para meta são calculados com os custos e taxas informados. Confirme as tarifas reais no painel do Mercado Livre.';
+ $('classicProfit').className='good';$('premiumProfit').className='good';
+ $('comparison').innerHTML=[['Clássico',c],['Premium',p]].map(([name,r])=>`<tr><td><strong>${name}</strong></td><td>${money(r.target)}</td><td>${money(r.costs)}</td><td class="${r.profit>=0?'good':'bad'}"><strong>${money(r.profit)}</strong></td><td>${pct(r.margin)}</td></tr>`).join('');
+ $('warning').textContent=(num('classicRate')+num('adsRate')+num('taxRate')>=100||num('premiumRate')+num('adsRate')+num('taxRate')>=100)?'Atenção: os percentuais de uma modalidade chegaram a 100% ou mais; revise os valores.':'O lucro desejado é calculado como percentual do custo do produto. O preço recomendado inclui os custos adicionais e desconta as taxas percentuais configuradas. Confirme as tarifas reais no painel do Mercado Livre.';
 }
 function switchTab(tab){document.querySelectorAll('.panel').forEach(p=>p.classList.toggle('active',p.id===tab));document.querySelectorAll('nav button').forEach(b=>b.classList.toggle('active',b.dataset.tab===tab))}
 document.querySelectorAll('nav button').forEach(b=>b.addEventListener('click',()=>switchTab(b.dataset.tab)));
