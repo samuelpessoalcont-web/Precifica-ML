@@ -1,0 +1,138 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="theme-color" content="#ffe600">
+<meta name="description" content="Precifique produtos para o Mercado Livre, calcule margens, compare anúncios e acompanhe seu histórico.">
+<link rel="manifest" href="manifest.webmanifest">
+<title>Precifica ML</title>
+<style>
+:root{--yellow:#ffe600;--ink:#202124;--muted:#65676b;--bg:#f4f5f7;--card:#fff;--line:#e3e5e8;--green:#137333;--red:#b3261e}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.45 system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif}
+header{background:var(--yellow);padding:18px 16px 14px;position:sticky;top:0;z-index:5;box-shadow:0 2px 7px #0001}
+.head{max-width:1000px;margin:auto;display:flex;align-items:center;gap:12px}.logo{background:#202124;color:var(--yellow);font-weight:900;border-radius:12px;padding:10px;font-size:20px}.brand{font-weight:850;font-size:22px}.sub{font-size:12px;color:#3d3d3d}
+nav{display:flex;gap:8px;overflow:auto;max-width:1000px;margin:14px auto 0;padding-bottom:2px}
+nav button{white-space:nowrap;border:0;border-radius:999px;padding:9px 14px;background:#ffffff9c;color:#202124;font-weight:700}
+nav button.active{background:#202124;color:white}
+main{max-width:1000px;margin:18px auto;padding:0 14px 36px}.panel{display:none}.panel.active{display:block}
+.card{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:16px;margin-bottom:14px;box-shadow:0 2px 8px #00000006}
+h1,h2,h3{margin:0 0 10px;line-height:1.2}h1{font-size:24px}h2{font-size:19px}h3{font-size:16px}.muted{color:var(--muted);font-size:13px}
+.grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}.grid3{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}
+label{display:block;font-weight:700;font-size:13px;margin:0 0 5px}input,select{width:100%;min-width:0;border:1px solid #c8cbd0;border-radius:10px;padding:11px 10px;background:white;color:var(--ink);font:inherit}
+.field{margin-bottom:12px}.btn{border:0;border-radius:10px;padding:11px 14px;font:inherit;font-weight:800;cursor:pointer;background:var(--yellow);color:#202124}.btn.dark{background:#202124;color:#fff}.btn.light{background:#eef0f2}.btn.danger{background:#fde8e7;color:var(--red)}.actions{display:flex;gap:8px;flex-wrap:wrap}.metric{background:#f8f8f8;border:1px solid var(--line);border-radius:12px;padding:12px;min-width:0}.metric .label{font-size:12px;color:var(--muted)}.metric .value{font-size:21px;font-weight:850;overflow-wrap:anywhere}.good{color:var(--green)}.bad{color:var(--red)}.notice{padding:12px;border-radius:10px;background:#fff8cc;font-size:13px}
+table{width:100%;border-collapse:collapse;font-size:14px}th,td{text-align:left;border-bottom:1px solid var(--line);padding:10px 6px;vertical-align:top}th{font-size:12px;color:var(--muted)}td strong{display:block}.tablewrap{overflow-x:auto}.empty{padding:24px;text-align:center;color:var(--muted)}
+small{color:var(--muted)}.section-title{display:flex;justify-content:space-between;gap:10px;align-items:center;margin-bottom:12px}
+@media(max-width:650px){.grid,.grid3{grid-template-columns:1fr 1fr}.metric .value{font-size:18px}.brand{font-size:20px}main{padding:0 10px 28px}.card{padding:13px}}
+@media(max-width:390px){.grid,.grid3{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+<header>
+ <div class="head"><div class="logo">ML</div><div><div class="brand">Precifica ML</div><div class="sub">Seu lucro precisa aparecer antes da venda.</div></div></div>
+ <nav id="nav">
+  <button class="active" data-tab="calc">Precificar</button><button data-tab="catalog">Catálogo</button><button data-tab="history">Histórico</button><button data-tab="settings">Configurações</button>
+ </nav>
+</header>
+<main>
+<section id="calc" class="panel active">
+ <div class="card">
+  <h1>Calculadora de preço</h1><p class="muted">Preencha os custos e compare Clássico e Premium. As taxas abaixo são editáveis e não representam tarifas oficiais universais.</p>
+  <div class="field"><label for="productName">Nome do produto (opcional)</label><input id="productName" placeholder="Ex.: Cabo de dados USB"></div>
+  <div class="grid">
+   <div class="field"><label for="cost">Custo do produto (R$)</label><input id="cost" type="number" min="0" step=".01" value="3"></div>
+   <div class="field"><label for="salePrice">Preço de venda (R$)</label><input id="salePrice" type="number" min="0" step=".01" value="19.90"></div>
+   <div class="field"><label for="shipping">Frete pago por você (R$)</label><input id="shipping" type="number" min="0" step=".01" value="0"></div>
+   <div class="field"><label for="fixed">Tarifa fixa por venda (R$)</label><input id="fixed" type="number" min="0" step=".01" value="0"></div>
+   <div class="field"><label for="packaging">Embalagem/outros custos (R$)</label><input id="packaging" type="number" min="0" step=".01" value="0"></div>
+   <div class="field"><label for="target">Lucro desejado por unidade (R$)</label><input id="target" type="number" min="0" step=".01" value="10"></div>
+  </div>
+  <h3>Taxas percentuais</h3>
+  <div class="grid">
+   <div class="field"><label for="classicRate">Comissão Clássico (%)</label><input id="classicRate" type="number" min="0" max="99.99" step=".1" value="14"></div>
+   <div class="field"><label for="premiumRate">Comissão Premium (%)</label><input id="premiumRate" type="number" min="0" max="99.99" step=".1" value="19"></div>
+   <div class="field"><label for="adsRate">Publicidade (%)</label><input id="adsRate" type="number" min="0" max="99.99" step=".1" value="0"></div>
+   <div class="field"><label for="taxRate">Impostos (%)</label><input id="taxRate" type="number" min="0" max="99.99" step=".1" value="0"></div>
+  </div>
+  <div class="actions"><button class="btn" id="calculate">Calcular</button><button class="btn light" id="saveHistory">Salvar no histórico</button><button class="btn light" id="saveProduct">Salvar no catálogo</button></div>
+ </div>
+ <div class="card">
+  <div class="section-title"><h2>Resultado da simulação</h2><span class="muted" id="resultMode">Preço informado</span></div>
+  <div class="grid3">
+   <div class="metric"><div class="label">Lucro Clássico</div><div id="classicProfit" class="value">—</div><small id="classicMargin">Margem: —</small></div>
+   <div class="metric"><div class="label">Lucro Premium</div><div id="premiumProfit" class="value">—</div><small id="premiumMargin">Margem: —</small></div>
+   <div class="metric"><div class="label">Preço mínimo (Clássico)</div><div id="classicMin" class="value">—</div><small>Lucro zero estimado</small></div>
+  </div>
+  <div class="grid" style="margin-top:12px">
+   <div class="metric"><div class="label">Preço para meta (Clássico)</div><div id="classicTarget" class="value">—</div><small>Alcançar o lucro desejado</small></div>
+   <div class="metric"><div class="label">Preço para meta (Premium)</div><div id="premiumTarget" class="value">—</div><small>Alcançar o lucro desejado</small></div>
+  </div>
+  <div id="warning" class="notice" style="margin-top:12px">Revise as tarifas reais antes de publicar o anúncio.</div>
+ </div>
+ <div class="card">
+  <h2>Comparação de anúncios</h2><div class="tablewrap"><table><thead><tr><th>Modelo</th><th>Preço</th><th>Custos estimados</th><th>Lucro</th><th>Margem</th></tr></thead><tbody id="comparison"></tbody></table></div>
+ </div>
+</section>
+<section id="catalog" class="panel">
+ <div class="card"><div class="section-title"><h1>Catálogo</h1><button class="btn light" id="exportCatalog">Exportar CSV</button></div><p class="muted">Produtos salvos ficam neste dispositivo/navegador.</p><div id="catalogList" class="empty">Nenhum produto salvo ainda.</div></div>
+</section>
+<section id="history" class="panel">
+ <div class="card"><div class="section-title"><h1>Histórico</h1><div class="actions"><button class="btn light" id="exportHistory">Exportar CSV</button><button class="btn danger" id="clearHistory">Apagar</button></div></div><p class="muted">Cada simulação salva o preço, taxas e lucro estimado daquele momento.</p><div id="historyList" class="empty">Nenhuma simulação salva ainda.</div></div>
+</section>
+<section id="settings" class="panel">
+ <div class="card"><h1>Configurações e dados</h1><p>O Precifica ML salva dados localmente neste navegador. Para manter um backup, exporte o catálogo e o histórico em CSV.</p><div class="notice">Atenção: o app não está conectado à conta do Mercado Livre e não consulta tarifas automaticamente. Confira as condições exibidas na sua conta, pois comissões, tarifas fixas, frete e regras podem variar por categoria, preço, modalidade e reputação.</div><h2 style="margin-top:18px">Backup</h2><div class="actions"><button class="btn" id="backup">Baixar backup JSON</button><label class="btn light" style="cursor:pointer">Importar backup JSON<input id="restore" type="file" accept=".json,application/json" hidden></label><button class="btn danger" id="resetAll">Apagar todos os dados</button></div><p class="muted" style="margin-top:12px">O arquivo de backup inclui catálogo, histórico e configurações locais. Guarde-o em local seguro.</p></div>
+</section>
+<footer class="muted" style="text-align:center;padding:8px 8px 20px">Precifica ML · Ferramenta independente, sem vínculo oficial com o Mercado Livre.</footer>
+</main>
+<script>
+const $=id=>document.getElementById(id);
+const KEYS={catalog:'precifica_ml_catalog_v1',history:'precifica_ml_history_v1'};
+const ids=['productName','cost','salePrice','shipping','fixed','packaging','target','classicRate','premiumRate','adsRate','taxRate'];
+const defaults={productName:'',cost:'3',salePrice:'19.90',shipping:'0',fixed:'0',packaging:'0',target:'10',classicRate:'14',premiumRate:'19',adsRate:'0',taxRate:'0'};
+let catalog=read(KEYS.catalog,[]), history=read(KEYS.history,[]);
+function read(k,f){try{return JSON.parse(localStorage.getItem(k))??f}catch{return f}}
+function persist(){localStorage.setItem(KEYS.catalog,JSON.stringify(catalog));localStorage.setItem(KEYS.history,JSON.stringify(history))}
+function num(id){return Math.max(0,Number.parseFloat($(id).value)||0)}
+function money(n){return Number.isFinite(n)?n.toLocaleString('pt-BR',{style:'currency',currency:'BRL'}):'—'}
+function pct(n){return Number.isFinite(n)?n.toLocaleString('pt-BR',{maximumFractionDigits:1})+'%':'—'}
+function inputs(){return Object.fromEntries(ids.map(id=>[id,$(id).value]))}
+function compute(d=inputs()){
+ const n=k=>Math.max(0,Number.parseFloat(d[k])||0), fixed=n('cost')+n('shipping')+n('fixed')+n('packaging');
+ const ad=n('adsRate')/100, tax=n('taxRate')/100;
+ const calc=(rate,price=n('salePrice'))=>{const r=rate/100+ad+tax;return {rate:r,profit:price*(1-r)-fixed,margin:price>0?(price*(1-r)-fixed)/price*100:0,costs:fixed+price*r,min:r<1?fixed/(1-r):Infinity,target:r<1?(fixed+n('target'))/(1-r):Infinity}};
+ return {d,fixed,classic:calc(n('classicRate')),premium:calc(n('premiumRate'))};
+}
+function show(){
+ const x=compute(), c=x.classic,p=x.premium, price=num('salePrice');
+ $('classicProfit').textContent=money(c.profit);$('premiumProfit').textContent=money(p.profit);
+ $('classicMargin').textContent='Margem: '+pct(c.margin);$('premiumMargin').textContent='Margem: '+pct(p.margin);
+ $('classicProfit').className='value '+(c.profit>=0?'good':'bad');$('premiumProfit').className='value '+(p.profit>=0?'good':'bad');
+ $('classicMin').textContent=money(c.min);$('classicTarget').textContent=money(c.target);$('premiumTarget').textContent=money(p.target);
+ $('comparison').innerHTML=[['Clássico',c],['Premium',p]].map(([name,r])=>`<tr><td><strong>${name}</strong></td><td>${money(price)}</td><td>${money(r.costs)}</td><td class="${r.profit>=0?'good':'bad'}"><strong>${money(r.profit)}</strong></td><td>${pct(r.margin)}</td></tr>`).join('');
+ $('warning').textContent=(num('classicRate')+num('adsRate')+num('taxRate')>=100||num('premiumRate')+num('adsRate')+num('taxRate')>=100)?'Atenção: os percentuais de uma modalidade chegaram a 100% ou mais; revise os valores.':'Estimativa: preço mínimo e preço para meta são calculados com os custos e taxas informados. Confirme as tarifas reais no painel do Mercado Livre.';
+}
+function switchTab(tab){document.querySelectorAll('.panel').forEach(p=>p.classList.toggle('active',p.id===tab));document.querySelectorAll('nav button').forEach(b=>b.classList.toggle('active',b.dataset.tab===tab))}
+document.querySelectorAll('nav button').forEach(b=>b.addEventListener('click',()=>switchTab(b.dataset.tab)));
+$('calculate').onclick=show;ids.forEach(id=>$(id).addEventListener('input',show));
+function snapshot(){const x=compute();return {id:Date.now(),date:new Date().toISOString(),name:$('productName').value.trim()||'Produto sem nome',...inputs(),classicProfit:x.classic.profit,premiumProfit:x.premium.profit,classicTarget:x.classic.target,premiumTarget:x.premium.target,classicMargin:x.classic.margin,premiumMargin:x.premium.margin}}
+$('saveHistory').onclick=()=>{history.unshift(snapshot());history=history.slice(0,500);persist();renderHistory();alert('Simulação salva no histórico!')};
+$('saveProduct').onclick=()=>{const d=inputs();if(!d.productName.trim()){alert('Informe o nome do produto para salvar no catálogo.');return}const item={id:Date.now(),...d,updatedAt:new Date().toISOString()};const idx=catalog.findIndex(p=>p.productName.trim().toLowerCase()===d.productName.trim().toLowerCase());if(idx>=0)catalog[idx]=item;else catalog.unshift(item);persist();renderCatalog();alert('Produto salvo no catálogo!')};
+function esc(s){return String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}
+function renderCatalog(){if(!catalog.length){$('catalogList').className='empty';$('catalogList').textContent='Nenhum produto salvo ainda.';return}$('catalogList').className='tablewrap';$('catalogList').innerHTML='<table><thead><tr><th>Produto</th><th>Custo</th><th>Preço</th><th>Ações</th></tr></thead><tbody>'+catalog.map(p=>`<tr><td><strong>${esc(p.productName)}</strong></td><td>${money(Number(p.cost)||0)}</td><td>${money(Number(p.salePrice)||0)}</td><td><div class="actions"><button class="btn light" onclick="loadProduct(${p.id})">Abrir</button><button class="btn danger" onclick="deleteProduct(${p.id})">Excluir</button></div></td></tr>`).join('')+'</tbody></table>'}
+window.loadProduct=id=>{const p=catalog.find(p=>p.id===id);if(!p)return;ids.forEach(k=>{if(p[k]!==undefined)$(k).value=p[k]});show();switchTab('calc');window.scrollTo({top:0,behavior:'smooth'})};
+window.deleteProduct=id=>{if(confirm('Excluir este produto do catálogo?')){catalog=catalog.filter(p=>p.id!==id);persist();renderCatalog()}};
+function renderHistory(){if(!history.length){$('historyList').className='empty';$('historyList').textContent='Nenhuma simulação salva ainda.';return}$('historyList').className='tablewrap';$('historyList').innerHTML='<table><thead><tr><th>Data</th><th>Produto</th><th>Preço</th><th>Lucro Clássico</th><th>Lucro Premium</th></tr></thead><tbody>'+history.map(h=>`<tr><td>${new Date(h.date).toLocaleString('pt-BR')}</td><td><strong>${esc(h.name)}</strong><button class="btn light" onclick="loadHistory(${h.id})">Reabrir</button></td><td>${money(Number(h.salePrice)||0)}</td><td class="${h.classicProfit>=0?'good':'bad'}">${money(h.classicProfit)}</td><td class="${h.premiumProfit>=0?'good':'bad'}">${money(h.premiumProfit)}</td></tr>`).join('')+'</tbody></table>'}
+window.loadHistory=id=>{const h=history.find(h=>h.id===id);if(!h)return;ids.forEach(k=>{if(h[k]!==undefined)$(k).value=h[k]});show();switchTab('calc');window.scrollTo({top:0,behavior:'smooth'})};
+$('clearHistory').onclick=()=>{if(confirm('Apagar todo o histórico?')){history=[];persist();renderHistory()}};
+function download(name,content,type='text/plain'){const a=document.createElement('a');const url=URL.createObjectURL(new Blob([content],{type}));a.href=url;a.download=name;a.click();setTimeout(()=>URL.revokeObjectURL(url),1000)}
+function csv(rows){const cols=rows.length?Object.keys(rows[0]):[];return [cols.join(';'),...rows.map(r=>cols.map(k=>'"'+String(r[k]??'').replace(/"/g,'""')+'"').join(';'))].join('\r\n')}
+$('exportCatalog').onclick=()=>download('precifica-ml-catalogo.csv','\ufeff'+csv(catalog),'text/csv;charset=utf-8');
+$('exportHistory').onclick=()=>download('precifica-ml-historico.csv','\ufeff'+csv(history),'text/csv;charset=utf-8');
+$('backup').onclick=()=>download('precifica-ml-backup.json',JSON.stringify({version:1,catalog,history,settings:inputs()},null,2),'application/json');
+$('restore').onchange=async e=>{const f=e.target.files[0];if(!f)return;try{const d=JSON.parse(await f.text());if(!Array.isArray(d.catalog)||!Array.isArray(d.history))throw Error();if(!confirm('Importar backup e substituir catálogo e histórico atuais?'))return;catalog=d.catalog;history=d.history;persist();if(d.settings)ids.forEach(k=>{if(d.settings[k]!==undefined)$(k).value=d.settings[k]});show();renderCatalog();renderHistory();alert('Backup importado!')}catch{alert('Arquivo inválido ou incompatível.')}e.target.value=''};
+$('resetAll').onclick=()=>{if(confirm('Isso apagará catálogo e histórico deste dispositivo. Continuar?')){catalog=[];history=[];persist();renderCatalog();renderHistory();alert('Dados apagados.')}};
+if('serviceWorker' in navigator && location.protocol.startsWith('http'))window.addEventListener('load',()=>navigator.serviceWorker.register('./sw.js').catch(()=>{}));
+show();renderCatalog();renderHistory();
+</script>
+</body>
+</html>
